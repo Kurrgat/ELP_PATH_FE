@@ -41,7 +41,7 @@ jobs:
       # Build and Push Frontend Docker Image to ECR
       - name: Build and Push Frontend
         run: |
-          docker build -t angular-app 
+          docker build -t angular-app .
           docker tag angular-app:latest ${{ secrets.FRONTEND_REPO_URI }}:latest
           docker push ${{ secrets.FRONTEND_REPO_URI }}:latest
 
