@@ -5,28 +5,22 @@ on:
     branches: [ "main" ]
 
 env:
-  AWS_REGION: us-west-2                   # set this to your preferred AWS region, e.g. us-west-1
-  #ECR_REPOSITORY: my-ecr-repo           # set this to your Amazon ECR repository name
-  #ECS_SERVICE: my-ecs-service1                 # set this to your Amazon ECS service name
-  #ECS_CLUSTER: my-ecs-cluster                 # set this to your Amazon ECS cluster name
-  #ECS_TASK_DEFINITION: .github/workflows/my-ecs-taskdef-revision14.json # set this to the path to your Amazon ECS task definition in GitHub repo
-                                               # file, e.g. .aws/task-definition.json
-  #CONTAINER_NAME: my-ecs-container          # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
+  AWS_REGION: us-west-2
 
 permissions:
   contents: read
+
 jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: elpfe
-    
+
     steps:
+      # Checkout repository
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Set up AWS Credentials
+      # Configure AWS credentials
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -38,15 +32,18 @@ jobs:
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
 
-      # Build and Push Frontend Docker Image to ECR
-      - name: Build and Push Frontend
+      # Build and push Docker image
+      - name: Build and Push Frontend Docker Image
         run: |
           docker build -t angular-app .
           docker tag angular-app:latest ${{ secrets.FRONTEND_REPO_URI }}:latest
           docker push ${{ secrets.FRONTEND_REPO_URI }}:latest
 
-       # Deploy ECS Service Update (Optional)
-      - name: Update ECS Service with New Images
+      # Update ECS Service
+      - name: Update ECS Service with New Image
         run: |
-          aws ecs update-service --cluster my-cluster --service frontend-service --force-new-deployment
+          aws ecs update-service \
+            --cluster my-cluster \
+            --service frontend-service \
+            --force-new-deployment
 
