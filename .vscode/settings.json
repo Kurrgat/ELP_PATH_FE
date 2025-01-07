@@ -1,0 +1,5 @@
+{
+    "scm.alwaysShowActions": true,
+    "extensions.closeExtensionDetailsOnViewChange": true,
+    "scm.alwaysShowRepositories": false
+}
